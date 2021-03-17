@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/public/css/menu.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type=" text/javascript" src="/public/js/materialize.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <nav>
+        <a href="#" data-target="slide-out" class="sidenav-trigger left-align">
+            <i class="material-icons">menu</i>
+        </a>
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Cadastrar categoria</a>
+        </div>
+    </nav>
+    <ul id="slide-out" class="sidenav">
+        <li><a href="/dashboard"><i class="material-icons">insert_chart</i>Dashboard</a></li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">attach_money</i>Venda</a></li>
+        <li><a href="/vendas/cadastrar" class="waves-effect"><i class="material-icons">add_shopping_cart</i>Nova
+                venda</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">shopping_bag</i>Produtos</a></li>
+        <li><a href="/produtos/cadastrar" class="waves-effect"><i class="material-icons">add_box</i>Cadastrar</a></li>
+        <li><a href="/produtos/listar" class="waves-effect"><i class="material-icons">format_list_numbered</i>Listar</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">business_center</i>Fornecedores</a></li>
+        <li><a href="/fornecedores/cadastrar" class="waves-effect"><i class="material-icons">add_box</i>Cadastrar</a>
+        </li>
+        <li><a href="/fornecedores/listar" class="waves-effect"><i
+                    class="material-icons">format_list_numbered</i>Listar</a></li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">label</i>Categorias</a></li>
+        <li><a href="/categorias/cadastrar" class="waves-effect"><i class="material-icons">add_box</i>Cadastrar</a></li>
+        <li><a href="/categorias/listar" class="waves-effect"><i
+                    class="material-icons">format_list_numbered</i>Listar</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a href="/reiniciar-dados" class="waves-effect"><i class="material-icons">replay</i>Reiniciar dados</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a href="/login" class="waves-effect"><i class="material-icons">login</i>Sair</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+    </ul>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <div class="card col s12">
+                    <form class="col s12">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input placeholder="Descrição" id="descricao" name="descricao" required type="text"
+                                    class="validate">
+                                <label for="first_name">Descrição</label>
+                            </div>
+                        </div>
+                        <div class="row col s12">
+                            <button class="btn waves-effect waves-light" id="button" type="submit" onclick="save()"
+                                name="action">Salvar</button>
+                            <div id="loading" class="preloader-wrapper big active">
+                                <div class="spinner-layer spinner-blue-only">
+                                    <div class="circle-clipper left">
+                                        <div class="circle"></div>
+                                    </div>
+                                    <div class="gap-patch">
+                                        <div class="circle"></div>
+                                    </div>
+                                    <div class="circle-clipper right">
+                                        <div class="circle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <h6 style="color:green" id="success" />
+                <h6 style="color:red" id="error" />
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    var token = localStorage.getItem('token');
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('.sidenav');
+        var instances = M.Sidenav.init(elems, null);
+    });
+
+    document.getElementById('loading').style.display = "none";
+    function isEdicao() {
+        var url = window.location.pathname.split('cadastrar/')[1]
+        return url !== null && url !== undefined;
+    }
+
+    function getId() {
+        if (isEdicao()) {
+            return window.location.pathname.split('cadastrar/')[1]
+        }
+    }
+
+    if (isEdicao()) {
+        getCategoria(getId())
+    }
+
+    async function getCategoria(id) {
+        axios.get(`/api/categoria/${id}`, { headers: { authorization: `Bearer ${token}` } })
+            .then(res => {
+                document.getElementById("descricao").value = res.data.descricao;
+            })
+            .catch(error => {
+                document.getElementById('success').innerHTML = ''
+                document.getElementById('error').innerHTML = error.response.data.message
+            })
+    }
+
+    document.getElementById("button").addEventListener("click", function (event) {
+        event.preventDefault()
+    });
+    async function save() {
+        document.getElementById('button').style.display = "none";
+        document.getElementById('loading').style.display = "block";
+        var object = {};
+        new FormData(document.querySelector('form'))
+            .forEach(function (value, key) {
+                object[key] = value;
+            });
+
+        if (isEdicao()) {
+            await axios.put(`/api/categorias/${getId()}`, object, { headers: { authorization: `Bearer ${token}` } })
+                .then(data => {
+                    window.location.href = '/categorias/listar'
+                })
+                .catch(error => {
+                    document.getElementById('success').innerHTML = ''
+                    document.getElementById('error').innerHTML = error.response.data.message
+                })
+        } else {
+            await axios.post('/api/categorias', object, { headers: { authorization: `Bearer ${token}` } })
+                .then(data => {
+                    window.location.href = '/categorias/listar'
+                })
+                .catch(error => {
+                    document.getElementById('success').innerHTML = ''
+                    document.getElementById('error').innerHTML = error.response.data.message
+                })
+        }
+        document.getElementById('loading').style.display = "none";
+        document.getElementById('button').style.display = "block";
+    }
+</script>
+
+</html>

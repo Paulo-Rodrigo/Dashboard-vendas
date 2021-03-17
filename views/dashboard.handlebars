@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <link rel="stylesheet" type="text/css" href="/public/css/menu.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+</head>
+<script src="/socket.io/socket.io.js"></script>
+
+<body>
+    <nav>
+        <a href="#" data-target="slide-out" class="sidenav-trigger left-align">
+            <i class="material-icons">menu</i>
+        </a>
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Dashboard</a>
+        </div>
+    </nav>
+    <ul id="slide-out" class="sidenav">
+        <li><a href="/dashboard"><i class="material-icons">insert_chart</i>Dashboard</a></li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">attach_money</i>Venda</a></li>
+        <li><a href="/vendas/cadastrar" class="waves-effect"><i class="material-icons">add_shopping_cart</i>Nova
+                venda</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">shopping_bag</i>Produtos</a></li>
+        <li><a href="/produtos/cadastrar" class="waves-effect"><i class="material-icons">add_box</i>Cadastrar</a></li>
+        <li><a href="/produtos/listar" class="waves-effect"><i class="material-icons">format_list_numbered</i>Listar</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">business_center</i>Fornecedores</a></li>
+        <li><a href="/fornecedores/cadastrar" class="waves-effect"><i class="material-icons">add_box</i>Cadastrar</a>
+        </li>
+        <li><a href="/fornecedores/listar" class="waves-effect"><i
+                    class="material-icons">format_list_numbered</i>Listar</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a class="subheader"><i class="material-icons">label</i>Categorias</a></li>
+        <li><a href="/categorias/cadastrar" class="waves-effect"><i class="material-icons">add_box</i>Cadastrar</a></li>
+        <li><a href="/categorias/listar" class="waves-effect"><i
+                    class="material-icons">format_list_numbered</i>Listar</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a href="/reiniciar-dados" class="waves-effect"><i class="material-icons">replay</i>Reiniciar dados</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a href="/login" class="waves-effect"><i class="material-icons">login</i>Sair</a>
+        </li>
+        <li>
+            <div class="divider"></div>
+        </li>
+    </ul>
+    <br />
+    <div class="container">
+        <div class="row">
+            <div class="col m3">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Finalizadas</span>
+                    <div class="card-content">
+                        <h5 id="card1" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col m3">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Abertas</span>
+                    <div class="card-content">
+                        <h5 id="card2" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col m3">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Aprovadas</span>
+                    <div class="card-content">
+                        <h5 id="card3" />
+                    </div>
+                </div>
+            </div>
+            <div class="col m3">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Rejeitadas</span>
+                    <div class="card-content">
+                        <h5 id="card4" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col m12">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de vendas mensais</span>
+                    <div class="card-content">
+                        <canvas id="chart" width="400" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col m12">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de vendas mensais por valor da venda</span>
+                    <div class="card-content">
+                        <canvas id="chart7" width="400" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col m6">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de vendas por fornecedor</span>
+                    <div class="card-content">
+                        <canvas id="chart3" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col m6">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de vendas por categorias</span>
+                    <div class="card-content">
+                        <canvas id="chart4" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col m6">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de vendas por aprovações</span>
+                    <div class="card-content">
+                        <canvas id="chart5" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col m6">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de evendas por situações</span>
+                    <div class="card-content">
+                        <canvas id="chart6" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col m12">
+                <div class="card col s12 center-align">
+                    <span class="card-title">Análise de vendas por produtos</span>
+                    <div class="card-content">
+                        <canvas id="chart2" width="400" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+        var token = localStorage.getItem('token');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.sidenav');
+            var instances = M.Sidenav.init(elems, null);
+        });
+
+        getTotais()
+        var socket = io();
+        var ctx = document.getElementById('chart').getContext('2d');
+        var ctx2 = document.getElementById('chart2').getContext('2d');
+        var ctx3 = document.getElementById('chart3').getContext('2d');
+        var ctx4 = document.getElementById('chart4').getContext('2d');
+        var ctx5 = document.getElementById('chart5').getContext('2d');
+        var ctx6 = document.getElementById('chart6').getContext('2d');
+        var ctx7 = document.getElementById('chart7').getContext('2d');
+        async function getTotais() {
+            var totais = null;
+            await axios
+                .get('/api/dashboard/cards', { headers: { authorization: `Bearer ${token}` } })
+                .then(res => {
+                    totais = res.data
+                })
+                .catch(error => {
+                    window.location.href = '/login'
+                    totais = {
+                        card1: 0,
+                        card2: 0,
+                        card3: 0,
+                        card4: 0,
+                    }
+                })
+            const { card1, card2, card3, card4 } = totais
+            document.getElementById('card1').innerHTML = card1
+            document.getElementById('card2').innerHTML = card2
+            document.getElementById('card3').innerHTML = card3
+            document.getElementById('card4').innerHTML = card4
+        }
+
+        definirDados = (labels, label, data) => {
+            return {
+                labels: labels ? labels : [''],
+                datasets: [{
+                    label,
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: data ? data : [0],
+                    fill: false
+                }]
+            }
+        }
+        definirDadosPie = (labels, label, data) => {
+            return {
+                labels: labels ? labels : [''],
+                datasets: [{
+                    label,
+                    backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+                    borderColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+                    data: data ? data : [0],
+                    fill: false
+                }]
+            }
+        }
+        var dadosChart1 = definirDados(null, 'Vendas mensais', null)
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: dadosChart1,
+            options: {}
+        });
+        var dadosChart2 = definirDados(null, 'Vendas por produtos', null)
+        var chart2 = new Chart(ctx2, {
+            type: 'line',
+            data: dadosChart2,
+            options: {}
+        });
+        var dadosChart3 = definirDados(null, 'Vendas por fornecedores', null)
+        var chart3 = new Chart(ctx3, {
+            type: 'horizontalBar',
+            data: dadosChart3,
+            options: {}
+        });
+        var dadosChart4 = definirDados(null, 'Vendas por categorias', null)
+        var chart4 = new Chart(ctx4, {
+            type: 'horizontalBar',
+            data: dadosChart4,
+            options: {}
+        });
+        var dadosChart5 = definirDadosPie(null, 'Vendas por aprovações', null)
+        var chart5 = new Chart(ctx5, {
+            type: 'pie',
+            data: dadosChart5,
+            options: {}
+        });
+        var dadosChart6 = definirDadosPie(null, 'Vendas por situações', null)
+        var chart6 = new Chart(ctx6, {
+            type: 'doughnut',
+            data: dadosChart6,
+            options: {}
+        });
+
+        var dadosChart7 = definirDados(null, 'Vendas mensais por valor de venda', null)
+        var chart7 = new Chart(ctx7, {
+            type: 'line',
+            data: dadosChart7,
+            options: {}
+        });
+
+        getIndicadores()
+        async function getIndicadores() {
+            await axios
+                .get('/api/dashboard/indicadores', { headers: { authorization: `Bearer ${token}` } })
+                .then(res => {
+                    var vendasMensais = res.data.vendasMensais
+                    dadosChart1.labels = Object.values(vendasMensais).map(item => item._id)
+                    dadosChart1.datasets[0].data = Object.values(vendasMensais).map(item => item.value)
+                    chart.update()
+
+                    var vendasPorProdutos = res.data.vendasPorProdutos
+                    dadosChart2.labels = Object.values(vendasPorProdutos).map(item => item._id)
+                    dadosChart2.datasets[0].data = Object.values(vendasPorProdutos).map(item => item.value)
+                    chart2.update()
+
+                    var vendasPorFornecedores = res.data.vendasPorFornecedores
+                    dadosChart3.labels = Object.values(vendasPorFornecedores).map(item => item._id)
+                    dadosChart3.datasets[0].data = Object.values(vendasPorFornecedores).map(item => item.value)
+                    chart3.update()
+
+                    var vendasPorCategorias = res.data.vendasPorCategorias
+                    dadosChart4.labels = Object.values(vendasPorCategorias).map(item => item._id)
+                    dadosChart4.datasets[0].data = Object.values(vendasPorCategorias).map(item => item.value)
+                    chart4.update()
+
+                    var vendasPorSituacoes = res.data.vendasPorSituacoes
+                    dadosChart5.labels = Object.values(vendasPorSituacoes).map(item => item._id)
+                    dadosChart5.datasets[0].data = Object.values(vendasPorSituacoes).map(item => item.value)
+                    chart5.update()
+
+                    var vendasPorAprovacoes = res.data.vendasPorAprovacoes
+                    dadosChart6.labels = Object.values(vendasPorAprovacoes).map(item => item._id)
+                    dadosChart6.datasets[0].data = Object.values(vendasPorAprovacoes).map(item => item.value)
+                    chart6.update()
+
+                    var vendasMensaisPorValorVenda = res.data.vendasMensaisPorValorVenda
+                    dadosChart7.labels = Object.values(vendasMensaisPorValorVenda).map(item => item._id)
+                    dadosChart7.datasets[0].data = Object.values(vendasMensaisPorValorVenda).map(item => item.value)
+                    chart7.update()
+                }).catch(error => {
+                    window.location.href = '/login'
+                })
+        }
+
+        socket.on(`token:${token}`, function (value) {
+            var vendasMensais = value.vendasMensais
+            dadosChart1.labels = Object.values(vendasMensais).map(item => item._id)
+            dadosChart1.datasets[0].data = Object.values(vendasMensais).map(item => item.value)
+            chart.update()
+
+            var vendasPorProdutos = value.vendasPorProdutos
+            dadosChart2.labels = Object.values(vendasPorProdutos).map(item => item._id)
+            dadosChart2.datasets[0].data = Object.values(vendasPorProdutos).map(item => item.value)
+            chart2.update()
+
+            var vendasPorFornecedores = value.vendasPorFornecedores
+            dadosChart3.labels = Object.values(vendasPorFornecedores).map(item => item._id)
+            dadosChart3.datasets[0].data = Object.values(vendasPorFornecedores).map(item => item.value)
+            chart3.update()
+
+            var vendasPorCategorias = value.vendasPorCategorias
+            dadosChart4.labels = Object.values(vendasPorCategorias).map(item => item._id)
+            dadosChart4.datasets[0].data = Object.values(vendasPorCategorias).map(item => item.value)
+            chart4.update()
+
+            var vendasPorAprovacoes = value.vendasPorAprovacoes
+            dadosChart5.labels = Object.values(vendasPorAprovacoes).map(item => item._id)
+            dadosChart5.datasets[0].data = Object.values(vendasPorAprovacoes).map(item => item.value)
+            chart5.update()
+
+            var vendasPorSituacoes = value.vendasPorSituacoes
+            dadosChart6.labels = Object.values(vendasPorSituacoes).map(item => item._id)
+            dadosChart6.datasets[0].data = Object.values(vendasPorSituacoes).map(item => item.value)
+            chart6.update()
+
+            var vendasMensaisPorValorVenda = value.vendasMensaisPorValorVenda
+            dadosChart7.labels = Object.values(vendasMensaisPorValorVenda).map(item => item._id)
+            dadosChart7.datasets[0].data = Object.values(vendasMensaisPorValorVenda).map(item => item.value)
+            chart7.update()
+
+            document.getElementById('card1').innerHTML = value.cards.card1
+            document.getElementById('card2').innerHTML = value.cards.card2
+            document.getElementById('card3').innerHTML = value.cards.card3
+            document.getElementById('card4').innerHTML = value.cards.card4
+            document.getElementById('card5').innerHTML = value.cards.card5
+            document.getElementById('card6').innerHTML = value.cards.card6
+        });
+    </script>
+    <script type=" text/javascript" src="/public/js/materialize.min.js"></script>
+</body>
+
+</html>
